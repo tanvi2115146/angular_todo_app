@@ -1,0 +1,9 @@
+<form (ngSubmit)="onSubmit()">
+    <input type="text" placeholder="First Name" [(ngModel)]="user.firstname" name="firstname" required />
+    <input type="text" placeholder="Last Name" [(ngModel)]="user.lastname" name="lastname" required />
+    <input type="email" placeholder="Email" [(ngModel)]="user.email" name="email" required />
+    <input type="password" placeholder="Password" [(ngModel)]="user.password" name="password" required />
+    <button type="submit">Sign Up</button>
+  </form>
+  <p>{{ message }}</p>
+  

@@ -1,0 +1,29 @@
+<h2>Your Todo List</h2>
+
+<p *ngIf="message" style="color: green;">{{ message }}</p>
+
+<div class="form-section">
+  <input type="text" [(ngModel)]="taskTitle" placeholder="Task Title" />
+  <input type="text" [(ngModel)]="priority" placeholder="Priority" />
+
+ 
+
+<select [(ngModel)]="status">
+  <option value="Pending">Pending</option>
+  <option value="Complete">Complete</option>
+  <option value="In Progress">In Progress</option>
+</select>
+
+
+  <button *ngIf="!isEditing" (click)="addTodo()">Add Task</button>
+  <button *ngIf="isEditing" (click)="updateTodo()">Update Task</button>
+  <button *ngIf="isEditing" (click)="cancelEdit()">Cancel</button>
+</div>
+
+<ul class="todo-list">
+  <li *ngFor="let todo of todos">
+    <strong>{{ todo.taskTitle }}</strong> - Priority: {{ todo.priority }} | Status: {{ todo.status }}
+    <button (click)="openEditModal(todo)">Edit</button>
+    <button (click)="deleteTodo(todo._id)">Delete</button>
+  </li>
+</ul>
