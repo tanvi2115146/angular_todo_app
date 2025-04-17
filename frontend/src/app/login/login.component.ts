@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+
 
 @Component({
   standalone: true,
@@ -17,7 +19,7 @@ export class LoginComponent {
   };
   message = '';
 
-  constructor(private http: HttpClient,private router: Router) {}
+  constructor(private http: HttpClient,private router: Router, private cookieService: CookieService) {}
 
   onSubmit() {
     this.http.post<{ message: string; token?: string }>('http://localhost:3000/auth/login', this.user)
@@ -25,7 +27,7 @@ export class LoginComponent {
         next: res => {
           this.message = res.message;
           if (res.token) {
-            localStorage.setItem('token', res.token); 
+            this.cookieService.set('token', res.token); 
             this.router.navigate(['/todos']); 
           }
         },
@@ -33,3 +35,8 @@ export class LoginComponent {
       });
   }
 }
+
+
+
+
+

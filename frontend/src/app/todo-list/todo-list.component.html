@@ -2,6 +2,13 @@
 
 <p *ngIf="message" style="color: green;">{{ message }}</p>
 
+<input
+  type="text"
+  [(ngModel)]="searchTerm"
+  placeholder="Search by Task Title"
+  style="margin-bottom: 10px; width: 40%; padding: 5px;"
+/>
+
 <div class="form-section">
   <input type="text" [(ngModel)]="taskTitle" placeholder="Task Title" />
   <input type="text" [(ngModel)]="priority" placeholder="Priority" />
@@ -21,9 +28,33 @@
 </div>
 
 <ul class="todo-list">
-  <li *ngFor="let todo of todos">
+  <li *ngFor="let todo of paginatedTodos">
     <strong>{{ todo.taskTitle }}</strong> - Priority: {{ todo.priority }} | Status: {{ todo.status }}
     <button (click)="openEditModal(todo)">Edit</button>
     <button (click)="deleteTodo(todo._id)">Delete</button>
   </li>
 </ul>
+
+<div style="margin-top: 20px;">
+  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+    Previous
+  </button>
+
+  <button
+    *ngFor="let page of pageNumbers"
+    (click)="changePage(page)"
+    [ngClass]="{ 'active-page': page === currentPage }"
+    style="margin: 0 3px;"
+  >
+    {{ page }}
+  </button>
+
+  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+    Next
+  </button>
+</div>
+
+
+<br>
+
+<button (click)="logout()">Logout</button>

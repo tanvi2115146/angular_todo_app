@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-todo-list',
@@ -23,16 +24,16 @@ export class TodoListComponent implements OnInit {
   isEditing = false;
   editTodoId: string | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  searchTerm: string = '';
 
-  ngOnInit() {
-    this.fetchTodos();
-  }
 
-  getAuthHeaders() {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  }
+  currentPage = 1;
+  itemsPerPage = 5;
+
+
+
+  constructor(private http: HttpClient, private router: Router,private cookieService: CookieService) {}
+
 
   fetchTodos() {
     this.http.get<any[]>('http://localhost:3000/todo', {
@@ -42,6 +43,50 @@ export class TodoListComponent implements OnInit {
       error: err => this.message = 'Failed to load todos'
     });
   }
+
+
+  ngOnInit() {
+    this.fetchTodos();
+  }
+
+
+  getAuthHeaders() {
+    const token = this.cookieService.get('token')
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
+
+
+
+  get filteredTodos() {
+    return this.todos.filter(todo =>
+      todo.taskTitle.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+
+
+
+  get paginatedTodos() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredTodos.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.filteredTodos.length / this.itemsPerPage);
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+  
+
+
 
   addTodo() {
     if (!this.taskTitle || !this.priority || !this.status) return;
@@ -64,6 +109,7 @@ export class TodoListComponent implements OnInit {
       error: err => this.message = 'Failed to add task'
     });
   }
+
 
   deleteTodo(id: string) {
     if (!confirm('Are you sure you want to delete this task?')) return;
@@ -114,4 +160,13 @@ export class TodoListComponent implements OnInit {
       error: err => this.message = 'Failed to update task'
     });
   }
+
+
+
+  logout() {
+    this.cookieService.delete('token');
+    this.router.navigate(['/login']);
+  }
+  
+
 }

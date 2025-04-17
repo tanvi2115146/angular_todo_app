@@ -14,7 +14,7 @@ bootstrapApplication(AppComponent, {
       { path: '', component: HomeComponent },
       { path: 'signup', component: SignupComponent },
       { path: 'login', component: LoginComponent },
-      {path:'todos',component:TodoListComponent}
+      { path:'todos', component: TodoListComponent}
     ]),
     provideHttpClient()
   ],
