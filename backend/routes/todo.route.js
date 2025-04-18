@@ -11,7 +11,7 @@ const {addTodo,getTodo,updateTodo,deleteTodo,paginated}=require('../controllers/
 
 
 
-// router.post('/:id', authenticateToken, updateTodo);
+
 router.post('/add',addTodo);
 
 
@@ -23,7 +23,7 @@ router.put('/:id',updateTodo);
 
 router.delete('/:id',deleteTodo );
 
-router.paginated('/pagination',paginated)
+router.get('/pagination',paginated)
 
 
 

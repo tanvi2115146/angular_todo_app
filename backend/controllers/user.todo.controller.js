@@ -1,4 +1,6 @@
 const Todo = require('../models/todoModel');
+const mongoose = require('mongoose');
+
 
 
 
@@ -59,29 +61,46 @@ const deleteTodo = async (req, res) => {
 
 
 
-const paginated =  async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-  
+
+const paginated = async (req, res) => {
     try {
-      const todosAggregate = await Todo.aggregate([
-        { $match: { userId: req.user._id } },
-        {
-          $facet: {
-            data: [{ $skip: skip }, { $limit: limit }],
-            totalCount: [{ $count: "count" }]
-          }
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const search = req.query.search || '';
+  
+      const matchStage = {
+        $match: {
+          userId: new mongoose.Types.ObjectId(req.user._id),
+          taskTitle: { $regex: search, $options: 'i' } // case-insensitive search
         }
+      };
+  
+      const todos = await Todo.aggregate([
+        matchStage,
+        { $skip: (page - 1) * limit },
+        { $limit: limit }
       ]);
   
-      const todos = todosAggregate[0].data;
-      const total = todosAggregate[0].totalCount[0]?.count || 0;
+      const totalTodos = await Todo.countDocuments({
+        userId: req.user._id,
+        taskTitle: { $regex: search, $options: 'i' }
+      });
   
-      res.json({ todos, total });
+      const totalPages = Math.ceil(totalTodos / limit);
+  
+      return res.status(200).json({
+        todos,
+        totalPages,
+        currentPage: page,
+      });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching todos" });
+      console.error('Pagination error:', error);
+      return res.status(500).json({ message: "Server Error" });
     }
   };
+  
+  
+  
+  
 
 module.exports = { addTodo, getTodo, updateTodo, deleteTodo , paginated };

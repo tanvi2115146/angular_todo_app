@@ -15,13 +15,3 @@
     margin-left: 5px;
     padding: 2px 8px;
   }
-  
-  .active-page {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-weight: bold;
-  }
-  

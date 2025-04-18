@@ -1,17 +1,25 @@
 import { Injectable } from '@angular/core';
-import { HttpClient ,HttpParams } from '@angular/common/http';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PaginationService {
-  private baseUrl='https://localhost:3000/pagination';
+  private baseUrl = 'http://localhost:3000/todo/pagination';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cookieService: CookieService) {}
 
-  getTodos(page: number, limit: number) {
-    const params = new HttpParams().set('page', page).set('limit', limit);
-    return this.http.get<any>(this.baseUrl, { params });
+  getAuthHeaders() {
+    const token = this.cookieService.get('token');
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
+
+  getPaginatedTodos(page: number, limit: number, search = ''): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.baseUrl}?page=${page}&limit=${limit}&search=${search}`, { headers });
+  }
+  
 }
+

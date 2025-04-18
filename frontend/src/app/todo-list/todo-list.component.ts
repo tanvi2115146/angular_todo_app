@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
+import { PaginationService } from '../services/pagination.service'
+
 
 @Component({
   selector: 'app-todo-list',
@@ -26,13 +28,13 @@ export class TodoListComponent implements OnInit {
 
   searchTerm: string = '';
 
+  totalPages = 0;
+  currentPage = 1;
+  itemsPerPage = 5;
 
-  // currentPage = 1;
-  // itemsPerPage = 5;
-
-
-
-  constructor(private http: HttpClient, private router: Router,private cookieService: CookieService) {}
+  constructor(private http: HttpClient, private router: Router,private cookieService: CookieService,
+               private paginationService: PaginationService
+  ) {}
 
 
 
@@ -43,18 +45,9 @@ export class TodoListComponent implements OnInit {
 
 
 
-  fetchTodos() {
-    this.http.get<any[]>('http://localhost:3000/todo', {
-      headers: this.getAuthHeaders()
-    }).subscribe({
-      next: data => this.todos = data,
-      error: err => this.message = 'Failed to load todos'
-    });
-  }
-
 
   ngOnInit() {
-    this.fetchTodos();
+    this.loadTodos(this.currentPage);
   }
 
 
@@ -63,31 +56,16 @@ export class TodoListComponent implements OnInit {
 
   get filteredTodos() {
     return this.todos.filter(todo =>
-      todo.taskTitle.toLowerCase().includes(this.searchTerm.toLowerCase())
+      todo.taskTitle?.toLowerCase().includes(this.searchTerm.toLowerCase().trim())
     );
   }
+  
 
 
-
-
-  // get paginatedTodos() {
-  //   const start = (this.currentPage - 1) * this.itemsPerPage;
-  //   return this.filteredTodos.slice(start, start + this.itemsPerPage);
-  // }
-
-  // get totalPages() {
-  //   return Math.ceil(this.filteredTodos.length / this.itemsPerPage);
-  // }
-
-  // changePage(page: number) {
-  //   if (page >= 1 && page <= this.totalPages) {
-  //     this.currentPage = page;
-  //   }
-  // }
-
-  // get pageNumbers(): number[] {
-  //   return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  // }
+  onSearchChange() {
+    this.currentPage = 1;
+    this.loadTodos(this.currentPage);
+  }
   
 
 
@@ -108,7 +86,7 @@ export class TodoListComponent implements OnInit {
         this.message = res.message;
         this.taskTitle = this.priority =  '';
         this.status ='Pending';
-        this.fetchTodos();
+        this.loadTodos(this.currentPage); 
       },
       error: err => this.message = 'Failed to add task'
     });
@@ -123,7 +101,7 @@ export class TodoListComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.message = res.message;
-        this.fetchTodos();
+        this.loadTodos(this.currentPage); 
       },
       error: err => this.message = 'Failed to delete task'
     });
@@ -159,11 +137,39 @@ export class TodoListComponent implements OnInit {
       next: (res: any) => {
         this.message = res.message;
         this.cancelEdit();
-        this.fetchTodos();
+        this.loadTodos(this.currentPage); 
       },
       error: err => this.message = 'Failed to update task'
     });
   }
+
+
+
+//pagination
+
+loadTodos(page: number) {
+  this.paginationService.getPaginatedTodos(page, this.itemsPerPage, this.searchTerm).subscribe({
+    next: (res) => {
+      this.todos = res.todos;
+      this.totalPages = res.totalPages;
+      this.currentPage = res.currentPage;
+    },
+    error: () => {
+      this.message = 'Failed to load paginated todos';
+    }
+  });
+}
+
+
+changePage(page: number) {
+  if (page >= 1 && page <= this.totalPages) {
+    this.loadTodos(page);
+  }
+}
+
+get totalPagesArray(): number[] {
+  return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+}
 
 
 

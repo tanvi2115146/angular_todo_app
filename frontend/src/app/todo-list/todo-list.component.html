@@ -5,9 +5,11 @@
 <input
   type="text"
   [(ngModel)]="searchTerm"
+  (ngModelChange)="onSearchChange()"
   placeholder="Search"
   style="margin-bottom: 10px; width: 40%; padding: 5px;"
 />
+
 
 <div class="form-section">
   <input type="text" [(ngModel)]="taskTitle" placeholder="Task Title" />
@@ -27,8 +29,10 @@
   <button *ngIf="isEditing" (click)="cancelEdit()">Cancel</button>
 </div>
 
+
 <ul class="todo-list">
-  <li *ngFor="let todo of paginatedTodos">
+  <li *ngFor="let todo of todos">
+
     <strong>{{ todo.taskTitle }}</strong> - Priority: {{ todo.priority }} | Status: {{ todo.status }}
     <button (click)="openEditModal(todo)">Edit</button>
     <button (click)="deleteTodo(todo._id)">Delete</button>
@@ -36,26 +40,23 @@
 </ul>
 
 
-<!-- <div style="margin-top: 20px;">
-  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
-    Previous
-  </button>
+<div class="pagination">
+  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
 
-  <button
-    *ngFor="let page of pageNumbers"
-    (click)="changePage(page)"
-    [ngClass]="{ 'active-page': page === currentPage }"
-    style="margin: 0 3px;"
-  >
+  <ng-container *ngFor="let page of totalPagesArray">
+  <button 
+    (click)="changePage(page)" 
+    [class.active]="page === currentPage">
     {{ page }}
   </button>
+</ng-container>
 
-  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
-    Next
-  </button>
+
+  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
 </div>
 
 
-<br> -->
+
+
 
 <button (click)="logout()">Logout</button>
