@@ -57,4 +57,31 @@ const deleteTodo = async (req, res) => {
     }
 };
 
-module.exports = { addTodo, getTodo, updateTodo, deleteTodo };
+
+
+const paginated =  async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+  
+    try {
+      const todosAggregate = await Todo.aggregate([
+        { $match: { userId: req.user._id } },
+        {
+          $facet: {
+            data: [{ $skip: skip }, { $limit: limit }],
+            totalCount: [{ $count: "count" }]
+          }
+        }
+      ]);
+  
+      const todos = todosAggregate[0].data;
+      const total = todosAggregate[0].totalCount[0]?.count || 0;
+  
+      res.json({ todos, total });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching todos" });
+    }
+  };
+
+module.exports = { addTodo, getTodo, updateTodo, deleteTodo , paginated };

@@ -27,12 +27,20 @@ export class TodoListComponent implements OnInit {
   searchTerm: string = '';
 
 
-  currentPage = 1;
-  itemsPerPage = 5;
+  // currentPage = 1;
+  // itemsPerPage = 5;
 
 
 
   constructor(private http: HttpClient, private router: Router,private cookieService: CookieService) {}
+
+
+
+  getAuthHeaders() {
+    const token = this.cookieService.get('token')
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
+
 
 
   fetchTodos() {
@@ -50,10 +58,6 @@ export class TodoListComponent implements OnInit {
   }
 
 
-  getAuthHeaders() {
-    const token = this.cookieService.get('token')
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  }
 
 
 
@@ -66,24 +70,24 @@ export class TodoListComponent implements OnInit {
 
 
 
-  get paginatedTodos() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredTodos.slice(start, start + this.itemsPerPage);
-  }
+  // get paginatedTodos() {
+  //   const start = (this.currentPage - 1) * this.itemsPerPage;
+  //   return this.filteredTodos.slice(start, start + this.itemsPerPage);
+  // }
 
-  get totalPages() {
-    return Math.ceil(this.filteredTodos.length / this.itemsPerPage);
-  }
+  // get totalPages() {
+  //   return Math.ceil(this.filteredTodos.length / this.itemsPerPage);
+  // }
 
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
+  // changePage(page: number) {
+  //   if (page >= 1 && page <= this.totalPages) {
+  //     this.currentPage = page;
+  //   }
+  // }
 
-  get pageNumbers(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
+  // get pageNumbers(): number[] {
+  //   return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  // }
   
 
 

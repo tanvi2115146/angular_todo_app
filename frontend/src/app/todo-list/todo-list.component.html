@@ -5,7 +5,7 @@
 <input
   type="text"
   [(ngModel)]="searchTerm"
-  placeholder="Search by Task Title"
+  placeholder="Search"
   style="margin-bottom: 10px; width: 40%; padding: 5px;"
 />
 
@@ -35,7 +35,8 @@
   </li>
 </ul>
 
-<div style="margin-top: 20px;">
+
+<!-- <div style="margin-top: 20px;">
   <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
     Previous
   </button>
@@ -55,6 +56,6 @@
 </div>
 
 
-<br>
+<br> -->
 
 <button (click)="logout()">Logout</button>

@@ -33,7 +33,7 @@ const register = async (req, res) => {
 
 const auth = async (req, res) => {
     const { email, password } = req.body;
-
+    
     try {
         const user = await User.findOne({ email });
         if (!user) {
