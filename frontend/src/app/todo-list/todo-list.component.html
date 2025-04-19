@@ -10,10 +10,20 @@
   style="margin-bottom: 10px; width: 40%; padding: 5px;"
 />
 
+<select [(ngModel)]="selectedSort" (change)="applySort()" style="margin-bottom: 10px; margin-left: 10px;">
+  <option value="">Sort By</option>
+  <option value="priority">Priority (Low → High)</option>
+  <option value="status">Status (Complete → Pending)</option>
+</select>
 
 <div class="form-section">
   <input type="text" [(ngModel)]="taskTitle" placeholder="Task Title" />
-  <input type="text" [(ngModel)]="priority" placeholder="Priority" />
+
+  <select [(ngModel)]="priority">
+    <option value="low">Low</option>
+    <option value="high">Medium</option>
+    <option value="medium">High</option>
+  </select>
 
  
 
