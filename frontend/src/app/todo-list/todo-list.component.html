@@ -50,20 +50,13 @@
 </ul>
 
 
-<div class="pagination">
-  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
-
-  <ng-container *ngFor="let page of totalPagesArray">
-  <button 
-    (click)="changePage(page)" 
-    [class.active]="page === currentPage">
-    {{ page }}
-  </button>
-</ng-container>
+<app-pagination
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  (pageChange)="loadTodos($event)">
+</app-pagination>
 
 
-  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
-</div>
 
 
 

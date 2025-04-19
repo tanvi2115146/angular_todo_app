@@ -6,14 +6,14 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { PaginationService } from '../services/pagination.service';
-
+import { PaginationComponent } from '../pagination/pagination.component';
 
 
 
 @Component({
   selector: 'app-todo-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,PaginationComponent],
   templateUrl: './todo-list.component.html',
   styleUrls: ['./todo-list.component.css'] 
 })
@@ -72,7 +72,7 @@ export class TodoListComponent implements OnInit {
 
  applySort() {
   if (!this.selectedSort) {
-    this.todos = [...this.allTodos]; // Default
+    this.todos = [...this.allTodos];
     return;
   }
 
@@ -96,6 +96,7 @@ export class TodoListComponent implements OnInit {
 }
 
 
+//to sort  without pagination
 
  loadAllTodos() {
   this.http.get('http://localhost:3000/todo', {
@@ -216,18 +217,6 @@ export class TodoListComponent implements OnInit {
   }
 
 
-
-//pagination
-
-changePage(page: number) {
-  if (page >= 1 && page <= this.totalPages) {
-    this.loadTodos(page);
-  }
-}
-
-get totalPagesArray(): number[] {
-  return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-}
 
 
   logout() {
