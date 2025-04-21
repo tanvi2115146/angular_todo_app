@@ -63,41 +63,84 @@ const deleteTodo = async (req, res) => {
 
 
 const paginated = async (req, res) => {
-    try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 5;
-      const search = req.query.search || '';
-  
-      const matchStage = {
-        $match: {
-          userId: new mongoose.Types.ObjectId(req.user._id),
-          taskTitle: { $regex: search, $options: 'i' } // case-insensitive search
-        }
-      };
-  
-      const todos = await Todo.aggregate([
-        matchStage,
-        { $skip: (page - 1) * limit },
-        { $limit: limit }
-      ]);
-  
-      const totalTodos = await Todo.countDocuments({
-        userId: req.user._id,
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const search = req.query.search || '';
+    const sortField = req.query.sortField || ''; 
+
+    const matchStage = {
+      $match: {
+        userId: new mongoose.Types.ObjectId(req.user._id),
         taskTitle: { $regex: search, $options: 'i' }
+      }
+    };
+
+    const pipeline = [matchStage];
+
+    
+    if (sortField === 'priority') {
+      pipeline.push({
+        $addFields: {
+          priorityOrder: {
+            $switch: {
+              branches: [
+                { case: { $eq: ['$priority', 'High'] }, then: 1 },
+                { case: { $eq: ['$priority', 'Medium'] }, then: 2 },
+                { case: { $eq: ['$priority', 'Low'] }, then: 3 }
+              ],
+              default: 4
+            }
+          }
+        }
       });
-  
-      const totalPages = Math.ceil(totalTodos / limit);
-  
-      return res.status(200).json({
-        todos,
-        totalPages,
-        currentPage: page,
+      pipeline.push({ $sort: { priorityOrder: 1 } }); 
+    } else if (sortField === 'status') {
+      pipeline.push({
+        $addFields: {
+          statusOrder: {
+            $switch: {
+              branches: [
+                { case: { $eq: ['$status', 'Complete'] }, then: 1 },
+                { case: { $eq: ['$status', 'In Progress'] }, then: 2 },
+                { case: { $eq: ['$status', 'Pending'] }, then: 3 }
+              ],
+              default: 4
+            }
+          }
+        }
       });
-    } catch (error) {
-      console.error('Pagination error:', error);
-      return res.status(500).json({ message: "Server Error" });
+      pipeline.push({ $sort: { statusOrder: 1 } }); 
     }
-  };
+
+    
+    pipeline.push(
+      { $skip: (page - 1) * limit },
+      { $limit: limit }
+    );
+
+    const todos = await Todo.aggregate(pipeline);
+
+    const totalTodos = await Todo.countDocuments({
+      userId: req.user._id,
+      taskTitle: { $regex: search, $options: 'i' }
+    });
+
+    const totalPages = Math.ceil(totalTodos / limit);
+
+    return res.status(200).json({
+      todos,
+      totalPages,
+      currentPage: page,
+    });
+
+  } catch (error) {
+    console.error('Pagination error:', error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
   
   
   

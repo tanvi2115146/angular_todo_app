@@ -16,9 +16,9 @@ export class PaginationService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  getPaginatedTodos(page: number, limit: number, search = ''): Observable<any> {
+  getPaginatedTodos(page: number, limit: number, search = '',sortField=''): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get(`${this.baseUrl}?page=${page}&limit=${limit}&search=${search}`, { headers });
+    return this.http.get(`${this.baseUrl}?page=${page}&limit=${limit}&search=${search}&sortField=${sortField}`, { headers });
   }
   
 }

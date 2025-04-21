@@ -21,7 +21,7 @@ import { PaginationComponent } from '../pagination/pagination.component';
 export class TodoListComponent implements OnInit {
   todos: any[] = [];
   taskTitle = '';
-  priority = '';
+  priority = 'High';
   status = 'Pending';
   message = '';
 
@@ -35,8 +35,8 @@ export class TodoListComponent implements OnInit {
   itemsPerPage = 5;
 
  //sorting 
-  allTodos: any[] = []; 
-  selectedSort: string = '';
+  // allTodos: any[] = []; 
+  selectedSort: string = 'priority';
 
 
   constructor(private http: HttpClient, private router: Router,private cookieService: CookieService,
@@ -51,72 +51,33 @@ export class TodoListComponent implements OnInit {
   }
 
 
- // for sorting 
-
-
- loadTodos(page: number) {
-  this.paginationService.getPaginatedTodos(page, this.itemsPerPage, this.searchTerm).subscribe({
-    next: (res) => {
-      this.todos = res.todos;
-      this.totalPages = res.totalPages;
-      this.currentPage = res.currentPage;
-     
-    },
-    error: () => {
-      this.message = 'Failed to load paginated todos';
-    }
-  });
-}
-
-
-
- applySort() {
-  if (!this.selectedSort) {
-    this.todos = [...this.allTodos];
-    return;
-  }
-
-  if (this.selectedSort === 'priority') {
-    const order: any = { low: 1, medium: 2, high: 3 };
-    this.todos = [...this.allTodos].sort((a, b) => {
-      const aVal = order[a.priority?.toLowerCase()] || 0;
-      const bVal = order[b.priority?.toLowerCase()] || 0;
-      return aVal - bVal;
+loadTodos(page: number) {
+  this.paginationService
+    .getPaginatedTodos(page, this.itemsPerPage, this.searchTerm, this.selectedSort)
+    .subscribe({
+      next: (res) => {
+        this.todos = res.todos;
+        this.totalPages = res.totalPages;
+        this.currentPage = res.currentPage;
+      },
+      error: () => {
+        this.message = 'Failed to load paginated todos';
+      }
     });
-  }
-
-  if (this.selectedSort === 'status') {
-    const order: any = { complete: 1, 'in progress': 2, pending: 3 };
-    this.todos = [...this.allTodos].sort((a, b) => {
-      const aVal = order[a.status?.toLowerCase()] || 0;
-      const bVal = order[b.status?.toLowerCase()] || 0;
-      return aVal - bVal;
-    });
-  }
 }
 
-
-//to sort  without pagination
-
- loadAllTodos() {
-  this.http.get('http://localhost:3000/todo', {
-    headers: this.getAuthHeaders()
-  }).subscribe({
-    next: (res: any) => {
-      this.allTodos = res;
-      this.applySort(); 
-    },
-    error: () => {
-      this.message = 'Failed to load all todos';
-    }
-  });
-}
 
 
   ngOnInit() {
     this.loadTodos(this.currentPage);
-    this.loadAllTodos();
   }
+
+
+  applySort() {
+    this.currentPage = 1;
+    this.loadTodos(this.currentPage);
+  }
+  
 
 //search
 
@@ -151,7 +112,8 @@ export class TodoListComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.message = res.message;
-        this.taskTitle = this.priority =  '';
+        this.taskTitle = '';
+        this.priority =  'High';
         this.status ='Pending';
         this.loadTodos(this.currentPage); 
       },
@@ -189,7 +151,8 @@ export class TodoListComponent implements OnInit {
   cancelEdit() {
     this.isEditing = false;
     this.editTodoId = null;
-    this.taskTitle = this.priority =  '';
+    this.taskTitle ='';
+    this.priority =  'High';
     this.status ="Pending";
   }
 

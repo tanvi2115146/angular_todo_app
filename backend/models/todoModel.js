@@ -12,8 +12,8 @@ const todoSchema = new mongoose.Schema({
     },
     priority: { 
         type: String, 
-        enum: ["high", "medium", "low"], 
-        default: "medium" 
+        enum: ["High", "Medium", "Low"], 
+        default: "High" 
     },
     status: { 
         type: String, 
