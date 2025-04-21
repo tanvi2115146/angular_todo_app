@@ -68,49 +68,32 @@ const paginated = async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const search = req.query.search || '';
     const sortField = req.query.sortField || ''; 
+    const statusFilter=req.query.status || '';
+    const priorityFilter=req.query.priority || '' ;
 
     const matchStage = {
       $match: {
         userId: new mongoose.Types.ObjectId(req.user._id),
-        taskTitle: { $regex: search, $options: 'i' }
+        taskTitle: { $regex: search, $options: 'i' },
+
       }
+     
     };
 
+    if(statusFilter){
+      matchStage.$match.status=statusFilter;
+    }
+
+    if(priorityFilter){
+      matchStage.$match.priority = priorityFilter;
+    }
+  
     const pipeline = [matchStage];
 
     
-    if (sortField === 'priority') {
-      pipeline.push({
-        $addFields: {
-          priorityOrder: {
-            $switch: {
-              branches: [
-                { case: { $eq: ['$priority', 'High'] }, then: 1 },
-                { case: { $eq: ['$priority', 'Medium'] }, then: 2 },
-                { case: { $eq: ['$priority', 'Low'] }, then: 3 }
-              ],
-              default: 4
-            }
-          }
-        }
-      });
-      pipeline.push({ $sort: { priorityOrder: 1 } }); 
-    } else if (sortField === 'status') {
-      pipeline.push({
-        $addFields: {
-          statusOrder: {
-            $switch: {
-              branches: [
-                { case: { $eq: ['$status', 'Complete'] }, then: 1 },
-                { case: { $eq: ['$status', 'In Progress'] }, then: 2 },
-                { case: { $eq: ['$status', 'Pending'] }, then: 3 }
-              ],
-              default: 4
-            }
-          }
-        }
-      });
-      pipeline.push({ $sort: { statusOrder: 1 } }); 
+    if(sortField){
+
+      pipeline.push({ $sort: { [sortField]: -1 } }); 
     }
 
     

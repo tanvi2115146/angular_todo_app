@@ -34,6 +34,10 @@ export class TodoListComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 5;
 
+  filterStatus: string = '';
+  filterPriority: string = '';
+
+
  //sorting 
   // allTodos: any[] = []; 
   selectedSort: string = 'priority';
@@ -53,12 +57,14 @@ export class TodoListComponent implements OnInit {
 
 loadTodos(page: number) {
   this.paginationService
-    .getPaginatedTodos(page, this.itemsPerPage, this.searchTerm, this.selectedSort)
+    .getPaginatedTodos(page, this.itemsPerPage, this.searchTerm, this.selectedSort, this.filterStatus,
+      this.filterPriority)
     .subscribe({
       next: (res) => {
         this.todos = res.todos;
         this.totalPages = res.totalPages;
         this.currentPage = res.currentPage;
+       
       },
       error: () => {
         this.message = 'Failed to load paginated todos';
@@ -78,6 +84,10 @@ loadTodos(page: number) {
     this.loadTodos(this.currentPage);
   }
   
+
+  applyFilters(): void {
+    this.loadTodos(1);
+  }
 
 //search
 

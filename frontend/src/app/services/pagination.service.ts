@@ -16,9 +16,20 @@ export class PaginationService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  getPaginatedTodos(page: number, limit: number, search = '',sortField=''): Observable<any> {
+  getPaginatedTodos(page: number, limit: number, search = '',sortField='',status?:string, priority?:string): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get(`${this.baseUrl}?page=${page}&limit=${limit}&search=${search}&sortField=${sortField}`, { headers });
+    let url = `${this.baseUrl}?page=${page}&limit=${limit}&search=${search}&sortField=${sortField}`
+
+    if (status) {
+      url += `&status=${status}`;
+    }
+  
+    if (priority) {
+      url += `&priority=${priority}`;
+    }
+
+    
+  return this.http.get(url, { headers });
   }
   
 }

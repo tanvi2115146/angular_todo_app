@@ -15,7 +15,7 @@
 <select [(ngModel)]="selectedSort" (change)="applySort()">
   <option value="">No Sorting</option>
   <option value="priority">Priority(High ->Low)</option>
-  <option value="status">Status(Complete → Pending)</option>
+  <option value="status">Status(Pending -> Complete )</option>
 </select>
 
 
@@ -38,11 +38,31 @@
 </select>
 
 
+
+
+
+
   <button *ngIf="!isEditing" (click)="addTodo()">Add Task</button>
   <button *ngIf="isEditing" (click)="updateTodo()">Update Task</button>
   <button *ngIf="isEditing" (click)="cancelEdit()">Cancel</button>
 </div>
 
+
+<br><br>
+
+<select [(ngModel)]="filterStatus" (change)="applyFilters()">
+  <option value="">All Status</option>
+  <option value="Pending">Pending</option>
+  <option value="Complete">Complete</option>
+  <option value="In Progress">In Progress</option>
+</select>
+
+<select [(ngModel)]="filterPriority" (change)="applyFilters()">
+  <option value="">All Priority</option>
+  <option value="High">High</option>
+  <option value="Medium">Medium</option>
+  <option value="Low">Low</option>
+</select>
 
 <ul class="todo-list">
   <li *ngFor="let todo of todos">
